@@ -1,0 +1,580 @@
+<title>Dijital Davetiye</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Nunito:wght@300;400;600;700&display=swap">
+
+<style>
+/*
+  Layout: dikey kart, ortada; görsel alanı üstte, RSVP formu altta.
+  Tek tema: fildişi + derin altın — davetiye estetiği.
+
+  Görseli değiştirmek için: .visual sınıfına
+    background-image: url('davetiyeniz.jpg');
+  ekleyin.
+*/
+
+:root {
+  --ivory:       #F8F4EE;
+  --parchment:   #EAE0D1;
+  --gold:        #B5883C;
+  --gold-warm:   #C9A366;
+  --gold-faint:  rgba(181, 136, 60, 0.18);
+  --ink:         #1D1510;
+  --sepia:       #7A6245;
+  --sepia-soft:  #A8906E;
+  --glass:       rgba(248, 244, 238, 0.92);
+  --border:      rgba(181, 136, 60, 0.22);
+  --shadow-sm:   rgba(29, 21, 16, 0.10);
+  --shadow-lg:   rgba(29, 21, 16, 0.16);
+
+  --f-display:   'Cormorant Garamond', Georgia, serif;
+  --f-ui:        'Nunito', system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--f-ui);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 16px;
+  padding-block: 40px;
+}
+
+/* Subtle texture on page background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(181,136,60,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 90%, rgba(181,136,60,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Card ──────────────────────────────────────────── */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  background: var(--ivory);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 1px 3px var(--shadow-sm),
+    0 8px 32px var(--shadow-lg),
+    0 24px 64px rgba(29,21,16,0.08);
+  overflow: hidden;
+}
+
+/* ─── Invitation visual ─────────────────────────────── */
+.visual {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: #DDD5C5;
+
+  /*
+    ╔════════════════════════════════════╗
+    ║  Davetiye görselinizi buraya      ║
+    ║  ekleyin:                         ║
+    ║                                   ║
+    ║  background-image: url('...');    ║
+    ║  background-size: cover;          ║
+    ║  background-position: center;     ║
+    ╚════════════════════════════════════╝
+  */
+
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Placeholder dekor — görsel eklenince görünmez olur */
+.visual-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.has-image .visual-placeholder { opacity: 0; }
+
+.ornament-ring {
+  width: 120px;
+  height: 120px;
+  color: var(--gold-warm);
+  opacity: 0.35;
+}
+
+.placeholder-hint {
+  font-family: var(--f-ui);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sepia-soft);
+  opacity: 0.7;
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* Gradient: görselden form alanına geçiş */
+.visual::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(to bottom, transparent 0%, var(--ivory) 100%);
+  pointer-events: none;
+}
+
+/* ─── Canlı isim önizlemesi (kart üzerinde) ─────────── */
+.name-preview-area {
+  position: absolute;
+  /*
+    Bu konumu tasarımınızdaki isim alanıyla eşleştirin.
+    Varsayılan: kartın alt kısmı, form alanının hemen üstü.
+  */
+  bottom: 52px;
+  left: 0; right: 0;
+  z-index: 2;
+  text-align: center;
+  padding-inline: 28px;
+  pointer-events: none;
+}
+
+.name-preview-text {
+  font-family: var(--f-display);
+  font-size: clamp(19px, 5vw, 24px);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  transition: opacity 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.name-preview-text[data-empty="true"] {
+  opacity: 0.22;
+  font-style: italic;
+}
+
+/* ─── RSVP formu ────────────────────────────────────── */
+.rsvp-strip {
+  padding: 18px 24px 26px;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+
+.rsvp-label {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rsvp-label::before,
+.rsvp-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Ad Soyad alanı */
+.field {
+  margin-bottom: 13px;
+}
+
+.field-label {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  margin-bottom: 6px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.55);
+  font-family: var(--f-display);
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  transition: border-color 0.16s, box-shadow 0.16s, background 0.16s;
+}
+
+.field-input::placeholder {
+  font-style: italic;
+  color: var(--sepia-soft);
+  opacity: 0.7;
+}
+
+.field-input:focus {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 0 0 3px rgba(181,136,60,0.12);
+}
+
+.field-error {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #B84A28;
+  display: none;
+  letter-spacing: 0.02em;
+}
+
+.field-error.visible { display: block; }
+
+/* Butonlar */
+.rsvp-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-rsvp {
+  padding: 11px 6px;
+  font-family: var(--f-ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  border: 1px solid var(--gold);
+  cursor: pointer;
+  -webkit-appearance: none;
+  border-radius: 0;
+  line-height: 1;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.btn-rsvp:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.btn-rsvp:active {
+  transform: translateY(0) !important;
+  box-shadow: none !important;
+}
+
+.btn-come {
+  background: var(--gold);
+  color: var(--ivory);
+}
+
+.btn-come:hover {
+  background: #9E7530;
+  box-shadow: 0 3px 16px rgba(181,136,60,0.38);
+  transform: translateY(-1px);
+}
+
+.btn-notcome {
+  background: transparent;
+  color: var(--sepia);
+  border-color: rgba(181,136,60,0.42);
+}
+
+.btn-notcome:hover {
+  background: var(--gold-faint);
+  transform: translateY(-1px);
+}
+
+/* ─── Onay ekranı ──────────────────────────────────── */
+.confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--glass);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 32px;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.38s ease;
+}
+
+.confirm-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.confirm-icon {
+  width: 54px;
+  height: 54px;
+  color: var(--gold);
+  margin-bottom: 22px;
+  flex-shrink: 0;
+}
+
+.confirm-heading {
+  font-family: var(--f-display);
+  font-size: clamp(22px, 6vw, 28px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.25;
+  text-wrap: balance;
+  margin-bottom: 12px;
+}
+
+.confirm-name-span {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.confirm-body {
+  font-size: 13px;
+  color: var(--sepia);
+  line-height: 1.7;
+  max-width: 26ch;
+  text-wrap: balance;
+  margin-bottom: 28px;
+}
+
+.btn-change {
+  background: none;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+  font-family: var(--f-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sepia-soft);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.btn-change:hover { color: var(--sepia); }
+.btn-change:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ─── Reduced motion ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .btn-rsvp,
+  .confirm-overlay,
+  .field-input,
+  .name-preview-text { transition: none; }
+}
+</style>
+
+<!-- ─────────────────────────────────────────────────── -->
+<div class="card" id="invCard">
+
+  <!-- Davetiye görseli -->
+  <div class="visual" id="visualArea">
+
+    <!-- Görsel yokken gösterilen dekor -->
+    <div class="visual-placeholder" id="placeholder">
+      <svg class="ornament-ring" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <circle cx="60" cy="60" r="54" stroke="currentColor" stroke-width="1" stroke-dasharray="5 4"/>
+        <circle cx="60" cy="60" r="44" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 5"/>
+        <path d="M60 30 C60 30 68 46 86 46 C86 46 72 56 78 74 C78 74 64 64 60 72 C56 64 42 74 42 74 C48 56 34 46 34 46 C52 46 60 30 60 30Z"
+              fill="currentColor" opacity="0.3"/>
+        <path d="M60 20 L60 14 M60 106 L60 100 M14 60 L20 60 M100 60 L106 60"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+      <p class="placeholder-hint">Davetiye görseli<br>buraya gelecek</p>
+    </div>
+
+    <!-- Yazılan ismin kart üzerindeki canlı önizlemesi -->
+    <div class="name-preview-area">
+      <div class="name-preview-text" id="namePreview" data-empty="true">Ad Soyad</div>
+    </div>
+
+  </div><!-- /.visual -->
+
+  <!-- RSVP formu -->
+  <div class="rsvp-strip">
+    <p class="rsvp-label">Katılım Bildirimi</p>
+
+    <form id="rsvpForm" novalidate>
+
+      <div class="field">
+        <label class="field-label" for="guestName">Ad Soyad</label>
+        <input
+          class="field-input"
+          type="text"
+          id="guestName"
+          name="guestName"
+          placeholder="Adınızı ve soyadınızı giriniz"
+          autocomplete="name"
+          autocorrect="off"
+          spellcheck="false"
+        >
+        <p class="field-error" id="nameError" role="alert">Lütfen adınızı ve soyadınızı giriniz.</p>
+      </div>
+
+      <div class="rsvp-buttons">
+        <button type="submit" class="btn-rsvp btn-come" data-answer="geliyor">
+          Geliyorum
+        </button>
+        <button type="submit" class="btn-rsvp btn-notcome" data-answer="gelmiyor">
+          Gelmiyorum
+        </button>
+      </div>
+
+    </form>
+  </div><!-- /.rsvp-strip -->
+
+  <!-- Onay ekranı (form sonrası gösterilir) -->
+  <div class="confirm-overlay" id="confirmOverlay" role="status" aria-live="polite" tabindex="-1">
+    <svg class="confirm-icon" viewBox="0 0 54 54" fill="none" aria-hidden="true">
+      <circle cx="27" cy="27" r="24.5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5.5 4"/>
+      <path d="M17 28.5l7.5 7.5 13-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p class="confirm-heading" id="confirmHeading"></p>
+    <p class="confirm-body"   id="confirmBody"></p>
+    <button class="btn-change" id="btnChange" type="button">Değiştir</button>
+  </div>
+
+</div><!-- /.card -->
+
+<script>
+(function () {
+  'use strict';
+
+  const nameInput    = document.getElementById('guestName');
+  const namePreview  = document.getElementById('namePreview');
+  const nameError    = document.getElementById('nameError');
+  const form         = document.getElementById('rsvpForm');
+  const overlay      = document.getElementById('confirmOverlay');
+  const confirmHead  = document.getElementById('confirmHeading');
+  const confirmBody  = document.getElementById('confirmBody');
+  const btnChange    = document.getElementById('btnChange');
+
+  function esc(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // Canlı isim önizlemesi
+  nameInput.addEventListener('input', function () {
+    var val = this.value.trim();
+    if (val) {
+      namePreview.textContent = val;
+      namePreview.setAttribute('data-empty', 'false');
+      nameError.classList.remove('visible');
+    } else {
+      namePreview.textContent = 'Ad Soyad';
+      namePreview.setAttribute('data-empty', 'true');
+    }
+  });
+
+  // Her butona tıklandığında hangi cevabın seçildiğini yakala
+  var pendingAnswer = null;
+  form.querySelectorAll('.btn-rsvp').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      pendingAnswer = this.dataset.answer;
+    });
+  });
+
+  function showConfirm(name, answer) {
+    var coming = answer === 'geliyor';
+
+    if (coming) {
+      confirmHead.innerHTML =
+        'Görüşmek üzere, <span class="confirm-name-span">' + esc(name) + '</span>!';
+      confirmBody.textContent =
+        'Katılımınızı bildirdiniz. Sizi aramızda görmekten mutluluk duyacağız.';
+    } else {
+      confirmHead.innerHTML =
+        'Anlıyoruz, <span class="confirm-name-span">' + esc(name) + '</span>.';
+      confirmBody.textContent =
+        'Katılamayacağınızı bildirdiniz. Umarız başka bir zaman bir arada oluruz.';
+    }
+
+    overlay.classList.add('active');
+    setTimeout(function () { overlay.focus(); }, 50);
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var name = nameInput.value.trim();
+    if (!name) {
+      nameError.classList.add('visible');
+      nameInput.focus();
+      return;
+    }
+
+    var answer = pendingAnswer || 'geliyor';
+
+    // Kaydet (yalnızca bu tarayıcı için)
+    try {
+      localStorage.setItem('davetiye_name',   name);
+      localStorage.setItem('davetiye_answer', answer);
+    } catch (_) {}
+
+    showConfirm(name, answer);
+  });
+
+  // "Değiştir" butonu
+  btnChange.addEventListener('click', function () {
+    overlay.classList.remove('active');
+    nameInput.focus();
+  });
+
+  // Sayfa yenilendiğinde önceki cevabı göster
+  (function restoreSaved() {
+    try {
+      var name   = localStorage.getItem('davetiye_name');
+      var answer = localStorage.getItem('davetiye_answer');
+      if (!name || !answer) return;
+
+      nameInput.value = name;
+      namePreview.textContent = name;
+      namePreview.setAttribute('data-empty', 'false');
+      pendingAnswer = answer;
+      showConfirm(name, answer);
+    } catch (_) {}
+  })();
+})();
+</script>
