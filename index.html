@@ -299,21 +299,13 @@ body {
     <!-- Konum JS ile ayarlanır; değiştirmek için positionOverlays() içindeki % değerlerini düzenleyin -->
     <div class="overlay-form" id="formOverlay">
 
-      <!-- ⚠️  Formspree kurulumu (1 dakika):                          -->
-      <!--   1. formspree.io → "Get Started" → ücretsiz kayıt         -->
-      <!--   2. "+ New Form" → email adresinizi girin                  -->
-      <!--   3. Oluşturulan formdaki ID'yi (örn. xabcd123) aşağıya    -->
-      <!--      yapıştırın: https://formspree.io/f/FORM_ID_BURAYA      -->
       <form
         id="rsvpForm"
-        action="https://formspree.io/f/FORM_ID_BURAYA"
+        action="/send"
         method="POST"
         novalidate
         style="position:relative"
       >
-        <!-- Spam koruması -->
-        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
-        <input type="hidden" name="_subject" value="Nişan RSVP – Merve &amp; Devran">
 
         <!-- Ad Soyad -->
         <input
@@ -471,7 +463,7 @@ body {
   })();
 
   /* ═══════════════════════════════════════════════════════
-     3. RSVP Formu (Formspree + onay ekranı)
+     3. RSVP Formu + onay ekranı
      ═══════════════════════════════════════════════════════ */
   var form        = document.getElementById('rsvpForm');
   var nameInput   = document.getElementById('guestName');
@@ -512,18 +504,12 @@ body {
   });
 
   async function submitForm(name, rsvp) {
-    var fd = new FormData(form);
-    fd.set('rsvp', rsvp);
-
-    /* Formspree AJAX gönderimi */
     try {
-      var res = await fetch(form.action, {
+      await fetch('/send', {
         method: 'POST',
-        body:   fd,
-        headers: { 'Accept': 'application/json' }
+        body:   new URLSearchParams({ ad_soyad: name, rsvp: rsvp })
       });
-      /* Başarı veya hata — her durumda onay ekranını göster */
-    } catch (_) { /* Ağ hatası — yine de onay göster */ }
+    } catch (_) {}
 
     showConfirm(name, rsvp === 'Geliyorum');
 

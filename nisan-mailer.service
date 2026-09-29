@@ -1,0 +1,16 @@
+[Unit]
+Description=Nisan RSVP Mailer
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/davetiye
+ExecStart=/usr/bin/python3 /var/www/davetiye/send.py
+Restart=on-failure
+RestartSec=5
+Environment=GMAIL_USER=devrankacan9@gmail.com
+Environment=GMAIL_PASS=BURAYA_UYGULAMA_SIFRESI
+
+[Install]
+WantedBy=multi-user.target
