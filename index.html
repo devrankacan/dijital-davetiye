@@ -299,8 +299,11 @@ body {
     <!-- Konum JS ile ayarlanır; değiştirmek için positionOverlays() içindeki % değerlerini düzenleyin -->
     <div class="overlay-form" id="formOverlay">
 
-      <!-- Formspree endpoint'ini aşağıya girin.                                -->
-      <!-- formspree.io/f/ adresinden ücretsiz form oluşturup ID'yi yapıştırın. -->
+      <!-- ⚠️  Formspree kurulumu (1 dakika):                          -->
+      <!--   1. formspree.io → "Get Started" → ücretsiz kayıt         -->
+      <!--   2. "+ New Form" → email adresinizi girin                  -->
+      <!--   3. Oluşturulan formdaki ID'yi (örn. xabcd123) aşağıya    -->
+      <!--      yapıştırın: https://formspree.io/f/FORM_ID_BURAYA      -->
       <form
         id="rsvpForm"
         action="https://formspree.io/f/FORM_ID_BURAYA"
@@ -411,9 +414,9 @@ body {
   */
   var POS = {
     calendar: { top: 0.615, left: 0.05, w: 0.90, h: 0.265 }, /* tarih+mekan bölümü */
-    form:     { top: 0.878, left: 0.08, w: 0.84 },             /* alt beyaz alan     */
-    gapRatio: 0.030,   /* isim ile radyo arasındaki boşluk (görsel yüksekliğine oranı) */
-    extraPad: 0.115    /* görsel altına eklenen ekstra boşluk oranı (form alanı için)  */
+    form:     { top: 0.915, left: 0.08, w: 0.84 },             /* alt beyaz alan     */
+    gapRatio: 0.028,   /* isim ile radyo arasındaki boşluk (görsel yüksekliğine oranı) */
+    extraPad: 0.145    /* görsel altına eklenen ekstra boşluk oranı (form alanı için)  */
   };
 
   var inviteImg  = document.getElementById('inviteImg');
