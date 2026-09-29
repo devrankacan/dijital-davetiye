@@ -153,6 +153,28 @@ body {
   white-space: nowrap;
 }
 
+/* ── Gönder butonu ──────────────────────────────────────── */
+.btn-send {
+  display: block;
+  margin-top: clamp(10px, 2.8vw, 16px);
+  padding: 7px 22px;
+  background: var(--rose-dark);
+  color: var(--cream);
+  border: none;
+  border-radius: 1px;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-send:hover  { background: var(--ink); }
+.btn-send:active { transform: scale(0.97); }
+.btn-send:focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; }
+
 /* ── Error hint ─────────────────────────────────────────── */
 .form-error {
   position: absolute;
@@ -337,6 +359,9 @@ body {
           </label>
         </div>
 
+        <!-- Gönder butonu -->
+        <button type="button" id="btnSend" class="btn-send">Gönder</button>
+
         <!-- Hata mesajı (isim boşsa) -->
         <span class="form-error" id="formError" role="alert">Lütfen adınızı giriniz.</span>
 
@@ -491,6 +516,7 @@ body {
   var nameInput   = document.getElementById('guestName');
   var radios      = form.querySelectorAll('input[type="radio"]');
   var formError   = document.getElementById('formError');
+  var btnSend     = document.getElementById('btnSend');
   var confirmModal= document.getElementById('confirmModal');
   var confirmTitle= document.getElementById('confirmTitle');
   var confirmBody = document.getElementById('confirmBody');
@@ -507,18 +533,22 @@ body {
     btnEdit.focus();
   }
 
-  /* Radio seçilince otomatik gönder */
-  radios.forEach(function (r) {
-    r.addEventListener('change', function () {
-      var name = nameInput.value.trim();
-      if (!name) {
-        formError.classList.add('show');
-        nameInput.focus();
-        return;
-      }
-      formError.classList.remove('show');
-      submitForm(name, r.value);
-    });
+  btnSend.addEventListener('click', function () {
+    var name = nameInput.value.trim();
+    var checked = form.querySelector('input[type="radio"]:checked');
+    if (!name) {
+      formError.textContent = 'Lütfen adınızı giriniz.';
+      formError.classList.add('show');
+      nameInput.focus();
+      return;
+    }
+    if (!checked) {
+      formError.textContent = 'Lütfen katılım durumunuzu seçiniz.';
+      formError.classList.add('show');
+      return;
+    }
+    formError.classList.remove('show');
+    submitForm(name, checked.value);
   });
 
   nameInput.addEventListener('input', function () {
