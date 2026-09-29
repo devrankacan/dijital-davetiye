@@ -1,580 +1,592 @@
-<title>Dijital Davetiye</title>
-
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Merve &amp; Devran Nişanı</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Nunito:wght@300;400;600;700&display=swap">
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Nunito:wght@400;600;700&display=swap">
 <style>
-/*
-  Layout: dikey kart, ortada; görsel alanı üstte, RSVP formu altta.
-  Tek tema: fildişi + derin altın — davetiye estetiği.
-
-  Görseli değiştirmek için: .visual sınıfına
-    background-image: url('davetiyeniz.jpg');
-  ekleyin.
-*/
-
+/* ─── TOKENS ──────────────────────────────────────────── */
 :root {
-  --ivory:       #F8F4EE;
-  --parchment:   #EAE0D1;
-  --gold:        #B5883C;
-  --gold-warm:   #C9A366;
-  --gold-faint:  rgba(181, 136, 60, 0.18);
-  --ink:         #1D1510;
-  --sepia:       #7A6245;
-  --sepia-soft:  #A8906E;
-  --glass:       rgba(248, 244, 238, 0.92);
-  --border:      rgba(181, 136, 60, 0.22);
-  --shadow-sm:   rgba(29, 21, 16, 0.10);
-  --shadow-lg:   rgba(29, 21, 16, 0.16);
-
-  --f-display:   'Cormorant Garamond', Georgia, serif;
-  --f-ui:        'Nunito', system-ui, sans-serif;
-
-  color-scheme: light;
+  --cream:      #F8F5F0;
+  --rose:       #C9A88A;      /* invitation rose-gold */
+  --rose-dark:  #A5784E;
+  --ink:        #1E1714;
+  --sepia:      #7A6452;
+  --shadow:     rgba(30,23,20,0.18);
 }
 
+/* ─── BASE ────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  min-height: 100%;
-}
-
+html { background: var(--cream); }
 body {
-  background: var(--parchment);
-  color: var(--ink);
-  font-family: var(--f-ui);
+  min-height: 100svh;
+  background: var(--cream);
+  font-family: 'Nunito', system-ui, sans-serif;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-inline: 16px;
-  padding-block: 40px;
+  padding: 24px 12px env(safe-area-inset-bottom, 12px);
 }
 
-/* Subtle texture on page background */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(181,136,60,0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 50% 90%, rgba(181,136,60,0.05) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ─── Card ──────────────────────────────────────────── */
+/* ─── CARD ────────────────────────────────────────────── */
 .card {
-  position: relative;
-  z-index: 1;
   width: 100%;
-  max-width: 400px;
-  background: var(--ivory);
-  border: 1px solid var(--border);
-  box-shadow:
-    0 1px 3px var(--shadow-sm),
-    0 8px 32px var(--shadow-lg),
-    0 24px 64px rgba(29,21,16,0.08);
-  overflow: hidden;
+  max-width: 500px;
+  box-shadow: 0 2px 8px var(--shadow), 0 12px 40px rgba(30,23,20,0.12);
+  background: var(--cream);
 }
 
-/* ─── Invitation visual ─────────────────────────────── */
-.visual {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  background-color: #DDD5C5;
-
-  /*
-    ╔════════════════════════════════════╗
-    ║  Davetiye görselinizi buraya      ║
-    ║  ekleyin:                         ║
-    ║                                   ║
-    ║  background-image: url('...');    ║
-    ║  background-size: cover;          ║
-    ║  background-position: center;     ║
-    ╚════════════════════════════════════╝
-  */
-
+/* ─── INVITE WRAP — image + overlays ─────────────────── */
+.invite-wrap {
   position: relative;
+  width: 100%;
+  background: var(--cream); /* seamless extension below image */
+  /* Extra height below image is set by JS after load */
+}
+
+.invite-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── OVERLAY: Takvime Ekle (transparent hit area on date section) ── */
+/* Positions are set by JS. The calendar badge appears on hover.     */
+.overlay-calendar {
+  position: absolute;
+  cursor: pointer;
+  text-decoration: none;
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  padding-bottom: 1%;
+  /* Completely transparent — invitation design shows through */
 }
 
-/* Placeholder dekor — görsel eklenince görünmez olur */
-.visual-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
+.cal-badge {
+  pointer-events: none;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-.has-image .visual-placeholder { opacity: 0; }
-
-.ornament-ring {
-  width: 120px;
-  height: 120px;
-  color: var(--gold-warm);
-  opacity: 0.35;
-}
-
-.placeholder-hint {
-  font-family: var(--f-ui);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--sepia-soft);
-  opacity: 0.7;
-  text-align: center;
-  line-height: 1.8;
-}
-
-/* Gradient: görselden form alanına geçiş */
-.visual::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 45%;
-  background: linear-gradient(to bottom, transparent 0%, var(--ivory) 100%);
-  pointer-events: none;
-}
-
-/* ─── Canlı isim önizlemesi (kart üzerinde) ─────────── */
-.name-preview-area {
-  position: absolute;
-  /*
-    Bu konumu tasarımınızdaki isim alanıyla eşleştirin.
-    Varsayılan: kartın alt kısmı, form alanının hemen üstü.
-  */
-  bottom: 52px;
-  left: 0; right: 0;
-  z-index: 2;
-  text-align: center;
-  padding-inline: 28px;
-  pointer-events: none;
-}
-
-.name-preview-text {
-  font-family: var(--f-display);
-  font-size: clamp(19px, 5vw, 24px);
-  font-style: italic;
-  font-weight: 300;
-  color: var(--ink);
-  letter-spacing: 0.04em;
-  line-height: 1.3;
-  transition: opacity 0.2s;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.name-preview-text[data-empty="true"] {
-  opacity: 0.22;
-  font-style: italic;
-}
-
-/* ─── RSVP formu ────────────────────────────────────── */
-.rsvp-strip {
-  padding: 18px 24px 26px;
-  border-top: 1px solid var(--border);
-  position: relative;
-  z-index: 1;
-}
-
-.rsvp-label {
-  text-align: center;
-  font-size: 9px;
+  gap: 5px;
+  background: rgba(248,245,240,0.88);
+  border: 1px solid rgba(201,168,138,0.5);
+  border-radius: 2px;
+  padding: 4px 10px;
+  font-size: clamp(9px, 2vw, 12px);
   font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.rsvp-label::before,
-.rsvp-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* Ad Soyad alanı */
-.field {
-  margin-bottom: 13px;
-}
-
-.field-label {
-  display: block;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sepia);
-  margin-bottom: 6px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
-.field-input {
+.overlay-calendar:hover .cal-badge,
+.overlay-calendar:focus-visible .cal-badge { opacity: 1; transform: translateY(0); }
+.overlay-calendar:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+
+/* ── OVERLAY: RSVP form (transparent, over bottom of image) ── */
+/* Positions are set by JS                                      */
+.overlay-form {
+  position: absolute;
+}
+
+/* Name input — transparent, bottom-border only */
+.form-name {
+  display: block;
   width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.55);
-  font-family: var(--f-display);
-  font-size: 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1.2px solid rgba(30,23,20,0.30);
+  padding: 2px 0 3px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(13px, 3.8vw, 20px);
+  font-style: italic;
   color: var(--ink);
   outline: none;
+  caret-color: var(--rose-dark);
   -webkit-appearance: none;
-  border-radius: 0;
-  transition: border-color 0.16s, box-shadow 0.16s, background 0.16s;
 }
 
-.field-input::placeholder {
-  font-style: italic;
-  color: var(--sepia-soft);
-  opacity: 0.7;
-}
+.form-name::placeholder { color: rgba(30,23,20,0.30); }
+.form-name:focus { border-bottom-color: var(--rose); }
 
-.field-input:focus {
-  border-color: var(--gold);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 0 0 3px rgba(181,136,60,0.12);
-}
+/* Gap between name and radios — set dynamically */
+.form-gap { display: block; }
 
-.field-error {
-  margin-top: 5px;
-  font-size: 11px;
-  color: #B84A28;
-  display: none;
-  letter-spacing: 0.02em;
-}
-
-.field-error.visible { display: block; }
-
-/* Butonlar */
-.rsvp-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.btn-rsvp {
-  padding: 11px 6px;
-  font-family: var(--f-ui);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  border: 1px solid var(--gold);
-  cursor: pointer;
-  -webkit-appearance: none;
-  border-radius: 0;
-  line-height: 1;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    background 0.16s ease,
-    color 0.16s ease;
-}
-
-.btn-rsvp:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.btn-rsvp:active {
-  transform: translateY(0) !important;
-  box-shadow: none !important;
-}
-
-.btn-come {
-  background: var(--gold);
-  color: var(--ivory);
-}
-
-.btn-come:hover {
-  background: #9E7530;
-  box-shadow: 0 3px 16px rgba(181,136,60,0.38);
-  transform: translateY(-1px);
-}
-
-.btn-notcome {
-  background: transparent;
-  color: var(--sepia);
-  border-color: rgba(181,136,60,0.42);
-}
-
-.btn-notcome:hover {
-  background: var(--gold-faint);
-  transform: translateY(-1px);
-}
-
-/* ─── Onay ekranı ──────────────────────────────────── */
-.confirm-overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--glass);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+/* Radio choices */
+.rsvp-choices {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 32px;
-  z-index: 20;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.38s ease;
+  gap: clamp(14px, 6vw, 32px);
 }
 
-.confirm-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+.choice { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+.choice input[type="radio"] {
+  appearance: none; -webkit-appearance: none;
+  width:  clamp(13px, 3.2vw, 18px);
+  height: clamp(13px, 3.2vw, 18px);
+  border: 1.2px solid rgba(30,23,20,0.35);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.confirm-icon {
-  width: 54px;
-  height: 54px;
-  color: var(--gold);
-  margin-bottom: 22px;
-  flex-shrink: 0;
+.choice input[type="radio"]:checked {
+  background: var(--rose);
+  border-color: var(--rose);
+  box-shadow: inset 0 0 0 2.5px var(--cream);
 }
 
-.confirm-heading {
-  font-family: var(--f-display);
-  font-size: clamp(22px, 6vw, 28px);
-  font-weight: 400;
-  font-style: italic;
+.choice-text {
+  font-size: clamp(10px, 2.8vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.05em;
   color: var(--ink);
-  line-height: 1.25;
-  text-wrap: balance;
-  margin-bottom: 12px;
+  user-select: none;
+  white-space: nowrap;
 }
 
-.confirm-name-span {
-  font-style: normal;
+/* ── Error hint ─────────────────────────────────────────── */
+.form-error {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: rgba(180,60,30,0.88);
+  color: #fff;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--gold);
+  padding: 3px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  display: none;
 }
+.form-error.show { display: block; }
+
+/* ─── CONFIRMATION MODAL ──────────────────────────────── */
+.confirm-modal {
+  position: fixed; inset: 0;
+  background: rgba(248,245,240,0.97);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none; /* toggle to flex */
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  z-index: 50;
+  padding: 40px 28px;
+}
+.confirm-modal.open { display: flex; }
+
+.confirm-icon { color: var(--rose); margin-bottom: 18px; }
+
+.confirm-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(22px, 6vw, 30px);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 12px;
+  text-wrap: balance;
+  line-height: 1.25;
+}
+
+.confirm-title em { font-style: normal; color: var(--rose-dark); }
 
 .confirm-body {
-  font-size: 13px;
-  color: var(--sepia);
-  line-height: 1.7;
-  max-width: 26ch;
-  text-wrap: balance;
-  margin-bottom: 28px;
+  font-size: 13.5px; color: var(--sepia);
+  line-height: 1.7; max-width: 26ch;
+  text-wrap: balance; margin-bottom: 28px;
 }
 
-.btn-change {
-  background: none;
-  border: none;
+.btn-edit {
+  background: none; border: none;
   border-bottom: 1px solid currentColor;
-  padding-bottom: 1px;
-  font-family: var(--f-ui);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--sepia-soft);
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--sepia); cursor: pointer; padding-bottom: 2px;
+}
+.btn-edit:hover { color: var(--ink); }
+.btn-edit:focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; }
+
+/* ─── VINYL PLAYER ────────────────────────────────────── */
+.vinyl-player {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  z-index: 100;
+  width: clamp(56px, 14vw, 72px);
+  height: clamp(56px, 14vw, 72px);
   cursor: pointer;
-  transition: color 0.15s;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.btn-change:hover { color: var(--sepia); }
-.btn-change:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.vinyl-disc {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.32);
+  transition: box-shadow 0.25s;
+  will-change: transform;
+}
 
-/* ─── Reduced motion ────────────────────────────────── */
+.vinyl-player:hover .vinyl-disc {
+  box-shadow: 0 3px 14px rgba(0,0,0,0.40), 0 0 0 3px rgba(201,168,138,0.45);
+}
+
+@keyframes spinVinyl {
+  to { transform: rotate(360deg); }
+}
+
+.vinyl-player.playing .vinyl-disc {
+  animation: spinVinyl 3.5s linear infinite;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.40), 0 0 0 3px rgba(201,168,138,0.55);
+}
+
+/* Pause icon — shows when playing */
+.vinyl-pause {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+  pointer-events: none;
+}
+.vinyl-player.playing:hover .vinyl-pause { opacity: 1; }
+.vinyl-pause svg { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+
+/* ─── REDUCED MOTION ──────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .btn-rsvp,
-  .confirm-overlay,
-  .field-input,
-  .name-preview-text { transition: none; }
+  .cal-badge, .choice input[type="radio"] { transition: none; }
+  .vinyl-player.playing .vinyl-disc { animation: none; }
 }
 </style>
+</head>
+<body>
 
-<!-- ─────────────────────────────────────────────────── -->
-<div class="card" id="invCard">
+<div class="card">
+  <div class="invite-wrap" id="inviteWrap">
 
-  <!-- Davetiye görseli -->
-  <div class="visual" id="visualArea">
+    <img
+      src="davetiye.jpeg"
+      alt="Merve &amp; Devran Nişan Daveti – 10 Ekim 2026"
+      class="invite-img"
+      id="inviteImg"
+    >
 
-    <!-- Görsel yokken gösterilen dekor -->
-    <div class="visual-placeholder" id="placeholder">
-      <svg class="ornament-ring" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-        <circle cx="60" cy="60" r="54" stroke="currentColor" stroke-width="1" stroke-dasharray="5 4"/>
-        <circle cx="60" cy="60" r="44" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 5"/>
-        <path d="M60 30 C60 30 68 46 86 46 C86 46 72 56 78 74 C78 74 64 64 60 72 C56 64 42 74 42 74 C48 56 34 46 34 46 C52 46 60 30 60 30Z"
-              fill="currentColor" opacity="0.3"/>
-        <path d="M60 20 L60 14 M60 106 L60 100 M14 60 L20 60 M100 60 L106 60"
-              stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
-      </svg>
-      <p class="placeholder-hint">Davetiye görseli<br>buraya gelecek</p>
-    </div>
+    <!-- ── Takvime Ekle: şeffaf tıklanabilir alan (tarih+mekan bölümü üzerinde) ── -->
+    <!-- Konum JS ile ayarlanır; değiştirmek için positionOverlays() içindeki % değerlerini düzenleyin -->
+    <a class="overlay-calendar" id="calendarOverlay" href="#" target="_blank" rel="noopener noreferrer" aria-label="Nişanı Google Takvim'e ekle">
+      <span class="cal-badge">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="2" width="14" height="13" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M5 1v2M11 1v2M1 6h14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <rect x="4" y="9" width="2" height="2" rx=".4" fill="currentColor"/>
+          <rect x="7" y="9" width="2" height="2" rx=".4" fill="currentColor"/>
+          <rect x="10" y="9" width="2" height="2" rx=".4" fill="currentColor"/>
+        </svg>
+        Takvime Ekle
+      </span>
+    </a>
 
-    <!-- Yazılan ismin kart üzerindeki canlı önizlemesi -->
-    <div class="name-preview-area">
-      <div class="name-preview-text" id="namePreview" data-empty="true">Ad Soyad</div>
-    </div>
+    <!-- ── RSVP Formu: şeffaf overlay (görselin alt beyaz alanı üzerinde) ── -->
+    <!-- Konum JS ile ayarlanır; değiştirmek için positionOverlays() içindeki % değerlerini düzenleyin -->
+    <div class="overlay-form" id="formOverlay">
 
-  </div><!-- /.visual -->
+      <!-- Formspree endpoint'ini aşağıya girin.                                -->
+      <!-- formspree.io/f/ adresinden ücretsiz form oluşturup ID'yi yapıştırın. -->
+      <form
+        id="rsvpForm"
+        action="https://formspree.io/f/FORM_ID_BURAYA"
+        method="POST"
+        novalidate
+        style="position:relative"
+      >
+        <!-- Spam koruması -->
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="_subject" value="Nişan RSVP – Merve &amp; Devran">
 
-  <!-- RSVP formu -->
-  <div class="rsvp-strip">
-    <p class="rsvp-label">Katılım Bildirimi</p>
-
-    <form id="rsvpForm" novalidate>
-
-      <div class="field">
-        <label class="field-label" for="guestName">Ad Soyad</label>
+        <!-- Ad Soyad -->
         <input
-          class="field-input"
           type="text"
+          name="ad_soyad"
           id="guestName"
-          name="guestName"
-          placeholder="Adınızı ve soyadınızı giriniz"
+          class="form-name"
+          placeholder="Ad Soyad"
           autocomplete="name"
           autocorrect="off"
           spellcheck="false"
         >
-        <p class="field-error" id="nameError" role="alert">Lütfen adınızı ve soyadınızı giriniz.</p>
-      </div>
 
-      <div class="rsvp-buttons">
-        <button type="submit" class="btn-rsvp btn-come" data-answer="geliyor">
-          Geliyorum
-        </button>
-        <button type="submit" class="btn-rsvp btn-notcome" data-answer="gelmiyor">
-          Gelmiyorum
-        </button>
-      </div>
+        <span class="form-gap" id="formGap"></span>
 
-    </form>
-  </div><!-- /.rsvp-strip -->
+        <!-- Geliyorum / Gelmiyorum -->
+        <div class="rsvp-choices">
+          <label class="choice">
+            <input type="radio" name="rsvp" value="Geliyorum" id="radioGeliyorum">
+            <span class="choice-text">Geliyorum</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="rsvp" value="Gelmiyorum" id="radioGelmiyorum">
+            <span class="choice-text">Gelmiyorum</span>
+          </label>
+        </div>
 
-  <!-- Onay ekranı (form sonrası gösterilir) -->
-  <div class="confirm-overlay" id="confirmOverlay" role="status" aria-live="polite" tabindex="-1">
-    <svg class="confirm-icon" viewBox="0 0 54 54" fill="none" aria-hidden="true">
-      <circle cx="27" cy="27" r="24.5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5.5 4"/>
-      <path d="M17 28.5l7.5 7.5 13-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <p class="confirm-heading" id="confirmHeading"></p>
-    <p class="confirm-body"   id="confirmBody"></p>
-    <button class="btn-change" id="btnChange" type="button">Değiştir</button>
-  </div>
+        <!-- Hata mesajı (isim boşsa) -->
+        <span class="form-error" id="formError" role="alert">Lütfen adınızı giriniz.</span>
 
+      </form>
+    </div>
+
+  </div><!-- /.invite-wrap -->
 </div><!-- /.card -->
+
+<!-- Onay ekranı -->
+<div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <svg class="confirm-icon" width="54" height="54" viewBox="0 0 54 54" fill="none" aria-hidden="true">
+    <circle cx="27" cy="27" r="24.5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5.5 4"/>
+    <path d="M17 29l7.5 7.5 12.5-13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <p class="confirm-title" id="confirmTitle"></p>
+  <p class="confirm-body"  id="confirmBody"></p>
+  <button class="btn-edit" id="btnEdit" type="button">Değiştir</button>
+</div>
+
+<!-- Plak çalar -->
+<div class="vinyl-player" id="vinyl" role="button" tabindex="0" aria-label="Müziği başlat / durdur">
+  <svg class="vinyl-disc" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+    <!-- Ana plak -->
+    <circle cx="36" cy="36" r="35.5" fill="#1A1614"/>
+    <!-- Oluk halkaları -->
+    <circle cx="36" cy="36" r="32" fill="none" stroke="#2C2420" stroke-width="1"/>
+    <circle cx="36" cy="36" r="28" fill="none" stroke="#2C2420" stroke-width="0.6"/>
+    <circle cx="36" cy="36" r="24" fill="none" stroke="#2C2420" stroke-width="0.6"/>
+    <circle cx="36" cy="36" r="20" fill="none" stroke="#2C2420" stroke-width="0.6"/>
+    <!-- Etiket alanı (rose-gold) -->
+    <circle cx="36" cy="36" r="16" fill="#B8924A"/>
+    <circle cx="36" cy="36" r="14" fill="#C9A36A"/>
+    <!-- Monogram -->
+    <text x="36" y="33" text-anchor="middle" fill="#FAF5EF" font-size="6.5" font-family="Georgia,serif" font-style="italic" font-weight="400">M &amp; D</text>
+    <text x="36" y="42" text-anchor="middle" fill="#FAF5EF" font-size="9" font-family="Georgia,serif">♪</text>
+    <!-- Merkez delik -->
+    <circle cx="36" cy="36" r="3" fill="#1A1614"/>
+    <!-- Parlaklık vurgusu -->
+    <ellipse cx="23" cy="21" rx="5" ry="3" fill="white" opacity="0.07" transform="rotate(-30 23 21)"/>
+  </svg>
+  <!-- Duraklat ikonu (çalarken hover'da görünür) -->
+  <div class="vinyl-pause">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="5" y="4" width="3.5" height="12" rx="1" fill="white"/>
+      <rect x="11.5" y="4" width="3.5" height="12" rx="1" fill="white"/>
+    </svg>
+  </div>
+</div>
+
+<audio id="bgMusic" src="muzik.mp3" preload="none"></audio>
 
 <script>
 (function () {
   'use strict';
 
-  const nameInput    = document.getElementById('guestName');
-  const namePreview  = document.getElementById('namePreview');
-  const nameError    = document.getElementById('nameError');
-  const form         = document.getElementById('rsvpForm');
-  const overlay      = document.getElementById('confirmOverlay');
-  const confirmHead  = document.getElementById('confirmHeading');
-  const confirmBody  = document.getElementById('confirmBody');
-  const btnChange    = document.getElementById('btnChange');
-
-  function esc(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+  /* ── Yardımcı ── */
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Canlı isim önizlemesi
-  nameInput.addEventListener('input', function () {
-    var val = this.value.trim();
-    if (val) {
-      namePreview.textContent = val;
-      namePreview.setAttribute('data-empty', 'false');
-      nameError.classList.remove('visible');
-    } else {
-      namePreview.textContent = 'Ad Soyad';
-      namePreview.setAttribute('data-empty', 'true');
-    }
-  });
+  /* ═══════════════════════════════════════════════════════
+     1. Overlay Konumlandırma (JS ile responsive)
+     ═══════════════════════════════════════════════════════
+     Görselin üzerindeki tüm overlay'ler, resmin gerçek
+     piksel boyutuna göre konumlandırılır. Böylece ekran
+     büyüklüğü ne olursa olsun doğru yerlerde kalır.
 
-  // Her butona tıklandığında hangi cevabın seçildiğini yakala
-  var pendingAnswer = null;
-  form.querySelectorAll('.btn-rsvp').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      pendingAnswer = this.dataset.answer;
+     Konumları değiştirmek için aşağıdaki % değerlerini
+     davetiyenizdeki çizili alanlara göre ayarlayın:
+  */
+  var POS = {
+    calendar: { top: 0.615, left: 0.05, w: 0.90, h: 0.265 }, /* tarih+mekan bölümü */
+    form:     { top: 0.878, left: 0.08, w: 0.84 },             /* alt beyaz alan     */
+    gapRatio: 0.030,   /* isim ile radyo arasındaki boşluk (görsel yüksekliğine oranı) */
+    extraPad: 0.115    /* görsel altına eklenen ekstra boşluk oranı (form alanı için)  */
+  };
+
+  var inviteImg  = document.getElementById('inviteImg');
+  var inviteWrap = document.getElementById('inviteWrap');
+  var calOverlay = document.getElementById('calendarOverlay');
+  var formOverlay= document.getElementById('formOverlay');
+  var formGap    = document.getElementById('formGap');
+
+  function positionOverlays() {
+    var h = inviteImg.offsetHeight;
+    var w = inviteImg.offsetWidth;
+    if (!h || !w) return;
+
+    /* Takvime Ekle alanı */
+    calOverlay.style.top    = (h * POS.calendar.top)  + 'px';
+    calOverlay.style.left   = (w * POS.calendar.left) + 'px';
+    calOverlay.style.width  = (w * POS.calendar.w)    + 'px';
+    calOverlay.style.height = (h * POS.calendar.h)    + 'px';
+
+    /* Form overlay */
+    formOverlay.style.top   = (h * POS.form.top)  + 'px';
+    formOverlay.style.left  = (w * POS.form.left) + 'px';
+    formOverlay.style.width = (w * POS.form.w)    + 'px';
+
+    /* İsim ile radyo arasındaki boşluk */
+    formGap.style.display    = 'block';
+    formGap.style.height     = (h * POS.gapRatio) + 'px';
+
+    /* Görsel altına ekstra beyaz alan (form elemanları için) */
+    inviteWrap.style.paddingBottom = (h * POS.extraPad) + 'px';
+  }
+
+  if (inviteImg.complete) {
+    positionOverlays();
+  } else {
+    inviteImg.addEventListener('load', positionOverlays);
+  }
+  window.addEventListener('resize', positionOverlays);
+
+  /* ═══════════════════════════════════════════════════════
+     2. Google Calendar URL
+     ═══════════════════════════════════════════════════════ */
+  (function () {
+    var p = new URLSearchParams({
+      text:     'Merve & Devran Nişanı',
+      dates:    '20261010T160000Z/20261010T190000Z', /* 19:00–22:00 Türkiye (UTC+3) */
+      details:  'Merve ve Devran\'ın nişan töreni.\nEver After - World Point, Büyükçekmece',
+      location: 'Ever After - World Point, Büyükçekmece',
+      ctz:      'Europe/Istanbul'
+    });
+    calOverlay.href = 'https://calendar.google.com/calendar/r/eventedit?' + p.toString();
+  })();
+
+  /* ═══════════════════════════════════════════════════════
+     3. RSVP Formu (Formspree + onay ekranı)
+     ═══════════════════════════════════════════════════════ */
+  var form        = document.getElementById('rsvpForm');
+  var nameInput   = document.getElementById('guestName');
+  var radios      = form.querySelectorAll('input[type="radio"]');
+  var formError   = document.getElementById('formError');
+  var confirmModal= document.getElementById('confirmModal');
+  var confirmTitle= document.getElementById('confirmTitle');
+  var confirmBody = document.getElementById('confirmBody');
+  var btnEdit     = document.getElementById('btnEdit');
+
+  function showConfirm(name, coming) {
+    confirmTitle.innerHTML = coming
+      ? 'Görüşmek üzere, <em>' + esc(name) + '</em>!'
+      : 'Anlıyoruz, <em>' + esc(name) + '</em>.';
+    confirmBody.textContent = coming
+      ? 'Katılımınızı bildirdiniz. Sizi aramızda görmekten mutluluk duyacağız.'
+      : 'Katılamayacağınızı bildirdiniz. Umarız başka bir zaman bir arada oluruz.';
+    confirmModal.classList.add('open');
+    btnEdit.focus();
+  }
+
+  /* Radio seçilince otomatik gönder */
+  radios.forEach(function (r) {
+    r.addEventListener('change', function () {
+      var name = nameInput.value.trim();
+      if (!name) {
+        formError.classList.add('show');
+        nameInput.focus();
+        return;
+      }
+      formError.classList.remove('show');
+      submitForm(name, r.value);
     });
   });
 
-  function showConfirm(name, answer) {
-    var coming = answer === 'geliyor';
-
-    if (coming) {
-      confirmHead.innerHTML =
-        'Görüşmek üzere, <span class="confirm-name-span">' + esc(name) + '</span>!';
-      confirmBody.textContent =
-        'Katılımınızı bildirdiniz. Sizi aramızda görmekten mutluluk duyacağız.';
-    } else {
-      confirmHead.innerHTML =
-        'Anlıyoruz, <span class="confirm-name-span">' + esc(name) + '</span>.';
-      confirmBody.textContent =
-        'Katılamayacağınızı bildirdiniz. Umarız başka bir zaman bir arada oluruz.';
-    }
-
-    overlay.classList.add('active');
-    setTimeout(function () { overlay.focus(); }, 50);
-  }
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    var name = nameInput.value.trim();
-    if (!name) {
-      nameError.classList.add('visible');
-      nameInput.focus();
-      return;
-    }
-
-    var answer = pendingAnswer || 'geliyor';
-
-    // Kaydet (yalnızca bu tarayıcı için)
-    try {
-      localStorage.setItem('davetiye_name',   name);
-      localStorage.setItem('davetiye_answer', answer);
-    } catch (_) {}
-
-    showConfirm(name, answer);
+  nameInput.addEventListener('input', function () {
+    if (this.value.trim()) formError.classList.remove('show');
   });
 
-  // "Değiştir" butonu
-  btnChange.addEventListener('click', function () {
-    overlay.classList.remove('active');
+  async function submitForm(name, rsvp) {
+    var fd = new FormData(form);
+    fd.set('rsvp', rsvp);
+
+    /* Formspree AJAX gönderimi */
+    try {
+      var res = await fetch(form.action, {
+        method: 'POST',
+        body:   fd,
+        headers: { 'Accept': 'application/json' }
+      });
+      /* Başarı veya hata — her durumda onay ekranını göster */
+    } catch (_) { /* Ağ hatası — yine de onay göster */ }
+
+    showConfirm(name, rsvp === 'Geliyorum');
+
+    try {
+      localStorage.setItem('davetiye_name', name);
+      localStorage.setItem('davetiye_rsvp',  rsvp);
+    } catch (_) {}
+  }
+
+  btnEdit.addEventListener('click', function () {
+    confirmModal.classList.remove('open');
     nameInput.focus();
   });
 
-  // Sayfa yenilendiğinde önceki cevabı göster
-  (function restoreSaved() {
-    try {
-      var name   = localStorage.getItem('davetiye_name');
-      var answer = localStorage.getItem('davetiye_answer');
-      if (!name || !answer) return;
+  /* Sayfa yenilendiğinde önceki cevabı göster */
+  try {
+    var sName = localStorage.getItem('davetiye_name');
+    var sRsvp = localStorage.getItem('davetiye_rsvp');
+    if (sName && sRsvp) {
+      nameInput.value = sName;
+      var prev = form.querySelector('input[value="' + sRsvp + '"]');
+      if (prev) prev.checked = true;
+      showConfirm(sName, sRsvp === 'Geliyorum');
+    }
+  } catch (_) {}
 
-      nameInput.value = name;
-      namePreview.textContent = name;
-      namePreview.setAttribute('data-empty', 'false');
-      pendingAnswer = answer;
-      showConfirm(name, answer);
-    } catch (_) {}
-  })();
+  /* ═══════════════════════════════════════════════════════
+     4. Plak Çalar (Vinyl Player)
+     ═══════════════════════════════════════════════════════ */
+  var vinyl   = document.getElementById('vinyl');
+  var music   = document.getElementById('bgMusic');
+  var playing = false;
+
+  function toggleMusic() {
+    playing = !playing;
+    vinyl.classList.toggle('playing', playing);
+    vinyl.setAttribute('aria-label', playing ? 'Müziği durdur' : 'Müziği başlat');
+
+    if (playing) {
+      music.play().catch(function () {
+        playing = false;
+        vinyl.classList.remove('playing');
+        vinyl.setAttribute('aria-label', 'Müziği başlat');
+      });
+    } else {
+      music.pause();
+    }
+  }
+
+  vinyl.addEventListener('click', toggleMusic);
+
+  vinyl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMusic();
+    }
+  });
+
+  music.addEventListener('ended', function () {
+    playing = false;
+    vinyl.classList.remove('playing');
+    vinyl.setAttribute('aria-label', 'Müziği başlat');
+  });
+
 })();
 </script>
+
+</body>
+</html>
