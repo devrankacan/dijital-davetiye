@@ -43,38 +43,100 @@ class MailHandler(BaseHTTPRequestHandler):
             self._json(500, {'ok': False, 'error': str(e)})
 
     def _send_mail(self, name, rsvp):
-        emoji  = '✅' if rsvp == 'Geliyorum' else '❌'
-        subject = f'{emoji} Nişan RSVP – {name}'
+        coming  = rsvp == 'Geliyorum'
+        subject = f'{"✅" if coming else "❌"} {name} — Nişan RSVP'
+
+        status_color = '#2E7D4F' if coming else '#8B3A2A'
+        status_bg    = '#EDF7F1' if coming else '#FAF0EE'
+        status_icon  = '✦' if coming else '✧'
 
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From']    = GMAIL_USER
         msg['To']      = GMAIL_USER
 
-        text = f'Ad Soyad: {name}\nKatılım Durumu: {rsvp}'
-        html = f"""
-        <div style="font-family:Georgia,serif;max-width:480px;margin:0 auto;
-                    border:1px solid #E8DDD0;padding:32px;background:#FAF7F2">
-          <h2 style="font-size:22px;font-weight:400;color:#1E1714;margin:0 0 20px">
-            {emoji} Nişan RSVP
-          </h2>
-          <table style="width:100%;border-collapse:collapse">
+        text = (
+            f'Merve & Devran Nişanı — RSVP\n\n'
+            f'Ad Soyad      : {name}\n'
+            f'Katılım Durumu: {rsvp}\n\n'
+            f'10 Ekim 2026 · Ever After - World Point, Büyükçekmece'
+        )
+
+        html = f"""<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F0EBE3;font-family:Georgia,'Times New Roman',serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0EBE3;padding:40px 16px">
+  <tr><td align="center">
+    <table width="100%" style="max-width:480px;background:#FAF7F2;border:1px solid #DDD3C7;border-radius:2px">
+
+      <!-- Üst şerit -->
+      <tr>
+        <td style="background:linear-gradient(135deg,#C9A88A 0%,#A5784E 100%);
+                   padding:28px 32px 24px;text-align:center">
+          <p style="margin:0 0 4px;font-size:11px;letter-spacing:.22em;
+                    text-transform:uppercase;color:rgba(255,248,235,.75)">Nişan Daveti</p>
+          <h1 style="margin:0;font-size:26px;font-weight:400;font-style:italic;
+                     color:#FAF5EF;letter-spacing:.04em">Merve &amp; Devran</h1>
+          <p style="margin:10px 0 0;font-size:12px;letter-spacing:.14em;
+                    text-transform:uppercase;color:rgba(255,248,235,.65)">10 Ekim 2026</p>
+        </td>
+      </tr>
+
+      <!-- İçerik -->
+      <tr>
+        <td style="padding:32px 32px 24px">
+
+          <!-- Durum rozeti -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px">
             <tr>
-              <td style="padding:10px 0;color:#7A6452;font-size:12px;
-                         letter-spacing:.1em;text-transform:uppercase">Ad Soyad</td>
-              <td style="padding:10px 0;color:#1E1714;font-size:16px">{name}</td>
-            </tr>
-            <tr style="border-top:1px solid #EDE4D6">
-              <td style="padding:10px 0;color:#7A6452;font-size:12px;
-                         letter-spacing:.1em;text-transform:uppercase">Katılım</td>
-              <td style="padding:10px 0;color:#1E1714;font-size:16px;
-                         font-weight:700">{rsvp}</td>
+              <td style="background:{status_bg};border:1px solid {'#B8DFC9' if coming else '#DEB8B0'};
+                         border-radius:2px;padding:14px 20px;text-align:center">
+                <span style="font-size:18px;color:{status_color};
+                             font-weight:700;letter-spacing:.03em">{status_icon} {rsvp}</span>
+              </td>
             </tr>
           </table>
-          <p style="margin:24px 0 0;font-size:11px;color:#A8906E">
-            Merve &amp; Devran Nişanı · 10 Ekim 2026
+
+          <!-- Misafir bilgisi -->
+          <table width="100%" cellpadding="0" cellspacing="0"
+                 style="border-top:1px solid #EDE4D6;border-bottom:1px solid #EDE4D6">
+            <tr>
+              <td style="padding:13px 0;width:38%;vertical-align:top">
+                <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+                             color:#A8906E;font-family:Helvetica,Arial,sans-serif">Ad Soyad</span>
+              </td>
+              <td style="padding:13px 0;vertical-align:top">
+                <span style="font-size:17px;color:#1E1714;font-style:italic">{name}</span>
+              </td>
+            </tr>
+            <tr style="border-top:1px solid #EDE4D6">
+              <td style="padding:13px 0;vertical-align:top">
+                <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+                             color:#A8906E;font-family:Helvetica,Arial,sans-serif">Mekan</span>
+              </td>
+              <td style="padding:13px 0;vertical-align:top">
+                <span style="font-size:13px;color:#3D2E26;line-height:1.5">
+                  Ever After – World Point<br>Büyükçekmece
+                </span>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Alt not -->
+          <p style="margin:22px 0 0;font-size:11px;color:#B09A82;text-align:center;
+                    font-family:Helvetica,Arial,sans-serif;letter-spacing:.06em">
+            nisan.taslak.site
           </p>
-        </div>"""
+
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>"""
 
         msg.attach(MIMEText(text, 'plain', 'utf-8'))
         msg.attach(MIMEText(html,  'html',  'utf-8'))
