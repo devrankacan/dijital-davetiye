@@ -44,7 +44,7 @@ class MailHandler(BaseHTTPRequestHandler):
 
     def _send_mail(self, name, rsvp):
         coming  = rsvp == 'Geliyorum'
-        subject = f'{"✅" if coming else "❌"} {name} — Nişan RSVP'
+        subject = f'{"✅" if coming else "❌"} {name} — Nişan Daveti'
 
         status_color = '#2E7D4F' if coming else '#8B3A2A'
         status_bg    = '#EDF7F1' if coming else '#FAF0EE'
@@ -56,7 +56,7 @@ class MailHandler(BaseHTTPRequestHandler):
         msg['To']      = GMAIL_USER
 
         text = (
-            f'Merve & Devran Nişanı — RSVP\n\n'
+            f'Merve & Devran Nişanı\n\n'
             f'Ad Soyad      : {name}\n'
             f'Katılım Durumu: {rsvp}\n\n'
             f'10 Ekim 2026 · Ever After - World Point, Büyükçekmece'
