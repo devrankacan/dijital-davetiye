@@ -246,9 +246,13 @@ body {
   to { transform: rotate(360deg); }
 }
 
+@keyframes vinylGlow {
+  0%, 100% { box-shadow: 0 3px 14px rgba(0,0,0,0.45), 0 0 0 3px rgba(201,168,138,0.55), 0 0 18px rgba(201,168,138,0.20); }
+  50%       { box-shadow: 0 3px 14px rgba(0,0,0,0.45), 0 0 0 3px rgba(201,168,138,0.75), 0 0 26px rgba(201,168,138,0.35); }
+}
+
 .vinyl-player.playing .vinyl-disc {
-  animation: spinVinyl 3.5s linear infinite;
-  box-shadow: 0 3px 14px rgba(0,0,0,0.40), 0 0 0 3px rgba(201,168,138,0.55);
+  animation: spinVinyl 3.5s linear infinite, vinylGlow 2.2s ease-in-out infinite;
 }
 
 /* Pause icon — shows when playing */
@@ -356,23 +360,41 @@ body {
 <!-- Plak çalar -->
 <div class="vinyl-player" id="vinyl" role="button" tabindex="0" aria-label="Müziği başlat / durdur">
   <svg class="vinyl-disc" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
-    <!-- Ana plak -->
-    <circle cx="36" cy="36" r="35.5" fill="#1A1614"/>
+    <defs>
+      <radialGradient id="vBg" cx="42%" cy="36%" r="62%">
+        <stop offset="0%" stop-color="#2E2724"/>
+        <stop offset="100%" stop-color="#0C0908"/>
+      </radialGradient>
+      <radialGradient id="vLabel" cx="40%" cy="34%" r="65%">
+        <stop offset="0%" stop-color="#D9AC5C"/>
+        <stop offset="55%" stop-color="#C49358"/>
+        <stop offset="100%" stop-color="#9A6E3A"/>
+      </radialGradient>
+    </defs>
+    <!-- Plak gövdesi -->
+    <circle cx="36" cy="36" r="35.5" fill="url(#vBg)"/>
     <!-- Oluk halkaları -->
-    <circle cx="36" cy="36" r="32" fill="none" stroke="#2C2420" stroke-width="1"/>
-    <circle cx="36" cy="36" r="28" fill="none" stroke="#2C2420" stroke-width="0.6"/>
-    <circle cx="36" cy="36" r="24" fill="none" stroke="#2C2420" stroke-width="0.6"/>
-    <circle cx="36" cy="36" r="20" fill="none" stroke="#2C2420" stroke-width="0.6"/>
-    <!-- Etiket alanı (rose-gold) -->
-    <circle cx="36" cy="36" r="16" fill="#B8924A"/>
-    <circle cx="36" cy="36" r="14" fill="#C9A36A"/>
+    <circle cx="36" cy="36" r="34"   fill="none" stroke="#1E1A18" stroke-width="0.5"/>
+    <circle cx="36" cy="36" r="32"   fill="none" stroke="#2C2420" stroke-width="0.6"/>
+    <circle cx="36" cy="36" r="30"   fill="none" stroke="#1E1A18" stroke-width="0.4"/>
+    <circle cx="36" cy="36" r="28"   fill="none" stroke="#2C2420" stroke-width="0.6"/>
+    <circle cx="36" cy="36" r="26"   fill="none" stroke="#1E1A18" stroke-width="0.4"/>
+    <circle cx="36" cy="36" r="24"   fill="none" stroke="#2C2420" stroke-width="0.6"/>
+    <circle cx="36" cy="36" r="22"   fill="none" stroke="#1E1A18" stroke-width="0.4"/>
+    <circle cx="36" cy="36" r="20"   fill="none" stroke="#2C2420" stroke-width="0.5"/>
+    <circle cx="36" cy="36" r="18"   fill="none" stroke="#1E1A18" stroke-width="0.4"/>
+    <!-- Döndüğünü belli eden büyük off-center parlaklık -->
+    <ellipse cx="17" cy="13" rx="13" ry="6" fill="white" opacity="0.16" transform="rotate(-28 17 13)"/>
+    <!-- İkincil küçük parlaklık (karşı taraf) -->
+    <ellipse cx="53" cy="54" rx="6"  ry="2.8" fill="white" opacity="0.07" transform="rotate(-28 53 54)"/>
+    <!-- Etiket -->
+    <circle cx="36" cy="36" r="15.5" fill="url(#vLabel)"/>
+    <circle cx="36" cy="36" r="13.5" fill="none" stroke="rgba(255,248,235,0.18)" stroke-width="0.6"/>
     <!-- Monogram -->
-    <text x="36" y="33" text-anchor="middle" fill="#FAF5EF" font-size="6.5" font-family="Georgia,serif" font-style="italic" font-weight="400">M &amp; D</text>
-    <text x="36" y="42" text-anchor="middle" fill="#FAF5EF" font-size="9" font-family="Georgia,serif">♪</text>
+    <text x="36" y="33.5" text-anchor="middle" fill="rgba(255,248,235,0.92)" font-size="5.8" font-family="Georgia,serif" font-style="italic">M &amp; D</text>
+    <text x="36" y="41.5" text-anchor="middle" fill="rgba(255,248,235,0.72)" font-size="8.5"  font-family="Georgia,serif">♪</text>
     <!-- Merkez delik -->
-    <circle cx="36" cy="36" r="3" fill="#1A1614"/>
-    <!-- Parlaklık vurgusu -->
-    <ellipse cx="23" cy="21" rx="5" ry="3" fill="white" opacity="0.07" transform="rotate(-30 23 21)"/>
+    <circle cx="36" cy="36" r="2.8" fill="#0C0908"/>
   </svg>
   <!-- Duraklat ikonu (çalarken hover'da görünür) -->
   <div class="vinyl-pause">
